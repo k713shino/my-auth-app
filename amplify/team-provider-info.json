@@ -16,5 +16,23 @@
         "myauthapp05a012fe": {}
       }
     }
+  },
+  "main": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-myauthapp-main-988af-authRole",
+      "UnauthRoleArn": "arn:aws:iam::373679319659:role/amplify-myauthapp-main-988af-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::373679319659:role/amplify-myauthapp-main-988af-authRole",
+      "Region": "ap-northeast-1",
+      "DeploymentBucketName": "amplify-myauthapp-main-988af-deployment",
+      "UnauthRoleName": "amplify-myauthapp-main-988af-unauthRole",
+      "StackName": "amplify-myauthapp-main-988af",
+      "StackId": "arn:aws:cloudformation:ap-northeast-1:373679319659:stack/amplify-myauthapp-main-988af/5a7ad6a0-509e-11f0-8e61-0a8e2652bf7d",
+      "AmplifyAppId": "d2sbnc044qgofh"
+    },
+    "categories": {
+      "auth": {
+        "myauthapp05a012fe": {}
+      }
+    }
   }
 }
