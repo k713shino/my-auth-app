@@ -1,42 +1,92 @@
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
-html,
-body {
-  max-width: 100vw;
-  overflow-x: hidden;
-}
-
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
+/* 基本スタイル */
 * {
   box-sizing: border-box;
-  padding: 0;
   margin: 0;
+  padding: 0;
 }
 
-a {
-  color: inherit;
-  text-decoration: none;
+html, body {
+  font-family: Arial, sans-serif;
+  background-color: #f5f5f5;
+  height: 100%;
 }
 
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
+/* Authenticatorのカスタマイズ */
+[data-amplify-authenticator] {
+  max-width: 400px;
+  margin: 50px auto;
+  padding: 20px;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+/* ボタンのスタイル */
+button[data-amplify-button] {
+  background-color: #007bff !important;
+  border-radius: 5px !important;
+  padding: 12px 24px !important;
+  font-size: 16px !important;
+}
+
+button[data-amplify-button]:hover {
+  background-color: #0056b3 !important;
+}
+
+/* 入力フィールドのスタイル */
+input[data-amplify-input] {
+  border-radius: 5px !important;
+  border: 1px solid #ddd !important;
+  padding: 12px !important;
+  font-size: 16px !important;
+}
+
+input[data-amplify-input]:focus {
+  border-color: #007bff !important;
+  box-shadow: 0 0 0 2px rgba(0,123,255,0.25) !important;
+}
+
+/* ヘッダーのスタイル */
+h1 {
+  color: #333;
+  margin-bottom: 30px;
+  font-size: 2rem;
+}
+
+h2 {
+  color: #333;
+  margin-bottom: 20px;
+  font-size: 1.5rem;
+}
+
+/* メインコンテンツのスタイル */
+.main-content {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+/* ローディングスタイル */
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  font-size: 18px;
+  color: #666;
+}
+
+/* レスポンシブ対応 */
+@media (max-width: 768px) {
+  [data-amplify-authenticator] {
+    margin: 20px;
+    padding: 15px;
+  }
+  
+  h1 {
+    font-size: 1.5rem;
   }
 }
