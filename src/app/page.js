@@ -70,6 +70,20 @@ export default function Home() {
       <Authenticator
         signUpAttributes={['email']}
         formFields={{
+          signIn: {
+            username: {
+              placeholder: 'ユーザー名を入力してください',
+              label: 'ユーザー名',
+              isRequired: true,
+              labelHidden: false,
+            },
+            password: {
+              placeholder: 'パスワードを入力してください', 
+              label: 'パスワード',
+              isRequired: true,
+              labelHidden: false,
+            },
+          },
           signUp: {
             username: {
               order: 1,
