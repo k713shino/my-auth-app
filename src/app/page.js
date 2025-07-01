@@ -2,133 +2,283 @@
 
 import { Authenticator } from '@aws-amplify/ui-react';
 import { getCurrentUser, signOut } from 'aws-amplify/auth';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { TodoApp } from './components/TodoComponents';
 
-export default function Home() {
+// スタイル定数
+const STYLES = {
+  container: {
+    padding: '20px',
+    textAlign: 'center',
+  },
+  welcomeContainer: {
+    padding: '20px',
+    textAlign: 'center',
+    maxWidth: '1200px',
+    margin: '0 auto',
+  },
+  header: {
+    backgroundColor: '#fff',
+    borderRadius: '10px',
+    boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
+    padding: '20px',
+    marginBottom: '30px',
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+  },
+  userInfo: {
+    textAlign: 'left',
+  },
+  button: {
+    padding: '12px 24px',
+    backgroundColor: '#ff4444',
+    color: 'white',
+    border: 'none',
+    borderRadius: '8px',
+    cursor: 'pointer',
+    fontSize: '16px',
+    fontWeight: '500',
+    transition: 'background-color 0.2s ease',
+  },
+  title: {
+    textAlign: 'center',
+    marginBottom: '30px',
+    color: '#333',
+    fontSize: '2rem',
+  },
+  loading: {
+    padding: '20px',
+    textAlign: 'center',
+    fontSize: '18px',
+    color: '#666',
+  },
+  errorContainer: {
+    color: '#e74c3c',
+    textAlign: 'center',
+    marginBottom: '20px',
+    padding: '10px',
+    backgroundColor: '#ffeaea',
+    borderRadius: '5px',
+    border: '1px solid #ffcccb',
+  },
+  authContainer: {
+    maxWidth: '500px',
+    margin: '0 auto',
+  },
+  description: {
+    marginBottom: '30px',
+    color: '#666',
+    fontSize: '16px',
+    lineHeight: '1.5',
+  },
+};
+
+// カスタムフック: 認証状態管理
+const useAuth = () => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  useEffect(() => {
-    checkUser();
-  }, []);
-
-  async function checkUser() {
+  const checkUser = useCallback(async () => {
     try {
+      setError(null);
       const currentUser = await getCurrentUser();
       setUser(currentUser);
     } catch (error) {
-      console.log('ユーザーがログインしていません');
+      console.log('ユーザーがログインしていません:', error);
+      setUser(null);
     } finally {
       setLoading(false);
     }
-  }
+  }, []);
 
-  const handleSignOut = async () => {
+  const handleSignOut = useCallback(async () => {
     try {
+      setError(null);
       await signOut();
       setUser(null);
     } catch (error) {
-      console.log('サインアウトエラー:', error);
+      console.error('サインアウトエラー:', error);
+      setError('サインアウトに失敗しました。もう一度お試しください。');
     }
-  };
+  }, []);
 
-  if (loading) {
-    return (
-      <div style={{ padding: '20px', textAlign: 'center' }}>
-        <p>読み込み中...</p>
-      </div>
-    );
-  }
+  useEffect(() => {
+    checkUser();
+  }, [checkUser]);
 
-  if (user) {
-    return (
-      <div style={{ padding: '20px', textAlign: 'center' }}>
-        <h1>ようこそ！</h1>
-        <p>こんにちは、{user.username}さん</p>
-        <p>ユーザーID: {user.userId}</p>
-        <button 
-          onClick={handleSignOut}
-          style={{
-            padding: '10px 20px',
-            backgroundColor: '#ff4444',
-            color: 'white',
-            border: 'none',
-            borderRadius: '5px',
-            cursor: 'pointer',
-            marginTop: '20px'
-          }}
-        >
-          ログアウト
-        </button>
-      </div>
-    );
-  }
+  return { user, loading, error, handleSignOut, setUser, setError };
+};
 
+// コンポーネント: ローディング表示
+const LoadingComponent = () => (
+  <div style={STYLES.loading}>
+    <p>読み込み中...</p>
+  </div>
+);
+
+const ErrorComponent = ({ error }) => {
+  if (!error) return null;
+  
   return (
-    <div style={{ padding: '20px' }}>
-      <h1 style={{ textAlign: 'center' }}>会員登録システム</h1>
-      <Authenticator
-        signUpAttributes={['email']}
-        formFields={{
-          signIn: {
-            username: {
-              placeholder: 'ユーザー名を入力してください',
-              label: 'ユーザー名',
-              isRequired: true,
-              labelHidden: false,
-            },
-            password: {
-              placeholder: 'パスワードを入力してください', 
-              label: 'パスワード',
-              isRequired: true,
-              labelHidden: false,
-            },
-          },
-          signUp: {
-            username: {
-              order: 1,
-              placeholder: 'ユーザー名を入力してください',
-              label: 'ユーザー名',
-            },
-            email: {
-              order: 2,
-              placeholder: 'メールアドレスを入力してください',
-              label: 'メールアドレス',
-            },
-            password: {
-              order: 3,
-              placeholder: 'パスワードを入力してください',
-              label: 'パスワード',
-            },
-            confirm_password: {
-              order: 4,
-              placeholder: 'パスワードを再入力してください',
-              label: 'パスワード確認',
-            },
-          },
+    <div style={STYLES.errorContainer}>
+      <p>{error}</p>
+    </div>
+  );
+};
+
+// コンポーネント: ヘッダー
+const Header = ({ user, onSignOut, error }) => (
+  <div style={STYLES.header}>
+    <div style={STYLES.userInfo}>
+      <h2>個人用Todoアプリへようこそ！</h2>
+      <p>ログイン中: <strong>{user.username}</strong></p>
+      <p>ユーザーID: <code>{user.userId}</code></p>
+    </div>
+    
+    <div>
+      <ErrorComponent error={error} />
+      <button 
+        onClick={onSignOut}
+        style={STYLES.button}
+        onMouseEnter={(e) => {
+          e.target.style.backgroundColor = '#e03e3e';
+        }}
+        onMouseLeave={(e) => {
+          e.target.style.backgroundColor = '#ff4444';
         }}
       >
-        {({ signOut, user }) => (
-          <div style={{ textAlign: 'center' }}>
-            <h2>ログイン成功！</h2>
-            <p>ようこそ、{user.username}さん</p>
-            <button 
-              onClick={signOut}
-              style={{
-                padding: '10px 20px',
-                backgroundColor: '#ff4444',
-                color: 'white',
-                border: 'none',
-                borderRadius: '5px',
-                cursor: 'pointer',
-                marginTop: '20px'
-              }}
-            >
-              ログアウト
-            </button>
-          </div>
-        )}
-      </Authenticator>
+        ログアウト
+      </button>
+    </div>
+  </div>
+);
+
+// コンポーネント: 認証されたユーザー向けコンテンツ
+const AuthenticatedContent = ({ signOut, user, setUser, setError }) => {
+  // Authenticatorコンテキスト内でのユーザー状態の同期
+  useEffect(() => {
+    if (user) {
+      setUser(user);
+      setError(null);
+    }
+  }, [user, setUser, setError]);
+
+  return (
+    <div style={STYLES.welcomeContainer}>
+      <Header 
+        user={user} 
+        onSignOut={() => {
+          signOut();
+          setUser(null);
+          setError(null);
+        }}
+      />
+      
+      {/* Todoアプリをここにレンダリング */}
+      <TodoApp user={user} />
+    </div>
+  );
+};
+
+// フォームフィールド設定
+const FORM_FIELDS = {
+  signIn: {
+    username: {
+      placeholder: 'ユーザー名を入力してください',
+      label: 'ユーザー名',
+      isRequired: true,
+      labelHidden: false,
+    },
+    password: {
+      placeholder: 'パスワードを入力してください', 
+      label: 'パスワード',
+      isRequired: true,
+      labelHidden: false,
+    },
+  },
+  signUp: {
+    username: {
+      order: 1,
+      placeholder: 'ユーザー名を入力してください',
+      label: 'ユーザー名',
+      isRequired: true,
+    },
+    email: {
+      order: 2,
+      placeholder: 'メールアドレスを入力してください',
+      label: 'メールアドレス',
+      isRequired: true,
+    },
+    password: {
+      order: 3,
+      placeholder: 'パスワードを入力してください',
+      label: 'パスワード',
+      isRequired: true,
+    },
+    confirm_password: {
+      order: 4,
+      placeholder: 'パスワードを再入力してください',
+      label: 'パスワード確認',
+      isRequired: true,
+    },
+  },
+};
+
+// メインコンポーネント
+export default function Home() {
+  const { user, loading, error, handleSignOut, setUser, setError } = useAuth();
+
+  // ローディング中の表示
+  if (loading) {
+    return <LoadingComponent />;
+  }
+
+  // ログイン済みユーザーの表示（Todoアプリ）
+  if (user) {
+    return (
+      <div style={STYLES.welcomeContainer}>
+        <Header 
+          user={user} 
+          onSignOut={handleSignOut} 
+          error={error}
+        />
+        
+        {/* Todoアプリをレンダリング */}
+        <TodoApp user={user} />
+      </div>
+    );
+  }
+
+  // 未ログインユーザーの認証フォーム
+  return (
+    <div style={STYLES.container}>
+      <h1 style={STYLES.title}>個人用Todoアプリ</h1>
+      <div style={STYLES.description}>
+        <p>あなた専用のTodoリストを管理できるアプリです。</p>
+        <p>ログインして、タスクの作成、編集、完了管理を始めましょう！</p>
+      </div>
+      
+      <ErrorComponent error={error} />
+      
+      <div style={STYLES.authContainer}>
+        <Authenticator
+          signUpAttributes={['email']}
+          formFields={FORM_FIELDS}
+          socialProviders={[]}
+        >
+          {({ signOut, user }) => (
+            <AuthenticatedContent 
+              signOut={signOut}
+              user={user}
+              setUser={setUser}
+              setError={setError}
+            />
+          )}
+        </Authenticator>
+      </div>
     </div>
   );
 }

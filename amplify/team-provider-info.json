@@ -32,6 +32,9 @@
     "categories": {
       "auth": {
         "myauthapp05a012fe": {}
+      },
+      "api": {
+        "myauthapp": {}
       }
     }
   }

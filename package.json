@@ -9,8 +9,10 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@aws-amplify/datastore": "^5.0.84",
     "@aws-amplify/ui-react": "^6.11.2",
     "aws-amplify": "^6.15.1",
+    "date-fns": "^4.1.0",
     "next": "15.3.4",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
