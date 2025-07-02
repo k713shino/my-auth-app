@@ -45,7 +45,6 @@ const STYLES = {
   title: {
     textAlign: 'center',
     marginBottom: '30px',
-    color: '#333',
     fontSize: '2rem',
   },
   loading: {
@@ -64,7 +63,7 @@ const STYLES = {
     border: '1px solid #ffcccb',
   },
   authContainer: {
-    maxWidth: '500px',
+    maxWidth: '520px',
     margin: '0 auto',
   },
   description: {
@@ -119,6 +118,7 @@ const LoadingComponent = () => (
   </div>
 );
 
+// コンポーネント: エラー表示
 const ErrorComponent = ({ error }) => {
   if (!error) return null;
   
@@ -155,33 +155,6 @@ const Header = ({ user, onSignOut, error }) => (
     </div>
   </div>
 );
-
-// コンポーネント: 認証されたユーザー向けコンテンツ
-const AuthenticatedContent = ({ signOut, user, setUser, setError }) => {
-  // Authenticatorコンテキスト内でのユーザー状態の同期
-  useEffect(() => {
-    if (user) {
-      setUser(user);
-      setError(null);
-    }
-  }, [user, setUser, setError]);
-
-  return (
-    <div style={STYLES.welcomeContainer}>
-      <Header 
-        user={user} 
-        onSignOut={() => {
-          signOut();
-          setUser(null);
-          setError(null);
-        }}
-      />
-      
-      {/* Todoアプリをここにレンダリング */}
-      <TodoApp user={user} />
-    </div>
-  );
-};
 
 // フォームフィールド設定
 const FORM_FIELDS = {
@@ -231,12 +204,10 @@ const FORM_FIELDS = {
 export default function Home() {
   const { user, loading, error, handleSignOut, setUser, setError } = useAuth();
 
-  // ローディング中の表示
   if (loading) {
     return <LoadingComponent />;
   }
 
-  // ログイン済みユーザーの表示（Todoアプリ）
   if (user) {
     return (
       <div style={STYLES.welcomeContainer}>
@@ -246,13 +217,11 @@ export default function Home() {
           error={error}
         />
         
-        {/* Todoアプリをレンダリング */}
         <TodoApp user={user} />
       </div>
     );
   }
 
-  // 未ログインユーザーの認証フォーム
   return (
     <div style={STYLES.container}>
       <h1 style={STYLES.title}>個人用Todoアプリ</h1>
@@ -270,12 +239,19 @@ export default function Home() {
           socialProviders={[]}
         >
           {({ signOut, user }) => (
-            <AuthenticatedContent 
-              signOut={signOut}
-              user={user}
-              setUser={setUser}
-              setError={setError}
-            />
+            <div style={STYLES.welcomeContainer}>
+              <Header 
+                user={user} 
+                onSignOut={() => {
+                  signOut();
+                  setUser(null);
+                  setError(null);
+                }} 
+                error={error}
+              />
+              
+              <TodoApp user={user} />
+            </div>
           )}
         </Authenticator>
       </div>
