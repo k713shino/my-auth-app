@@ -259,36 +259,53 @@ const TodoForm = ({ onSubmit, editingTodo, onCancel, loading }) => {
     }
   };
 
-  const [formData, setFormData] = useState({
-    title: editingTodo?.title || '',
-    description: editingTodo?.description || '',
-    priority: editingTodo?.priority || 'MEDIUM',
-    dueDate: getFormattedDateTime(editingTodo?.dueDate), // 修正：正しい形式で初期化
+  // 初期フォームデータの設定
+  const getInitialFormData = (todo) => ({
+    title: todo?.title || '',
+    description: todo?.description || '',
+    priority: todo?.priority || 'MEDIUM',
+    dueDate: getFormattedDateTime(todo?.dueDate),
   });
+
+  const [formData, setFormData] = useState(getInitialFormData(editingTodo));
+
+  // 編集対象が変更されたときにフォームデータを更新
+  useEffect(() => {
+    console.log('編集対象が変更されました:', editingTodo);
+    setFormData(getInitialFormData(editingTodo));
+  }, [editingTodo]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!formData.title.trim()) return;
+    if (!formData.title.trim()) {
+      alert('タイトルを入力してください！');
+      return;
+    }
+    
+    console.log('フォーム送信データ:', formData);
     
     onSubmit({
       ...formData,
       dueDate: formData.dueDate || null,
     });
     
+    // 新規作成の場合のみフォームをリセット
     if (!editingTodo) {
-      setFormData({
-        title: '',
-        description: '',
-        priority: 'MEDIUM',
-        dueDate: '',
-      });
+      setFormData(getInitialFormData(null));
     }
   };
 
-  // 残りのJSXは変更なし
+  const handleCancel = () => {
+    console.log('編集キャンセル');
+    setFormData(getInitialFormData(null)); // フォームをリセット
+    onCancel();
+  };
+
   return (
     <form onSubmit={handleSubmit} style={STYLES.form}>
-      <h3>{editingTodo ? 'Todoを編集' : '新しいTodoを作成'}</h3>
+      <h3 style={{ marginBottom: '20px', color: '#333' }}>
+        {editingTodo ? `「${editingTodo.title}」を編集` : '新しいTodoを作成'}
+      </h3>
       
       <div style={STYLES.inputGroup}>
         <label style={STYLES.label}>タイトル*</label>
@@ -296,11 +313,19 @@ const TodoForm = ({ onSubmit, editingTodo, onCancel, loading }) => {
           type="text"
           value={formData.title}
           onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-          style={STYLES.input}
-          placeholder="タイトルを入力"
+          style={{
+            ...STYLES.input,
+            borderColor: formData.title.trim() ? '#ddd' : '#ff6b6b'
+          }}
+          placeholder="タイトルを入力してください"
           required
           disabled={loading}
         />
+        {!formData.title.trim() && (
+          <small style={{ color: '#ff6b6b', fontSize: '12px' }}>
+            ※ タイトルは必須項目です
+          </small>
+        )}
       </div>
       
       <div style={STYLES.inputGroup}>
@@ -309,7 +334,7 @@ const TodoForm = ({ onSubmit, editingTodo, onCancel, loading }) => {
           value={formData.description}
           onChange={(e) => setFormData({ ...formData, description: e.target.value })}
           style={STYLES.textarea}
-          placeholder="詳細を入力（任意）"
+          placeholder="詳細を入力してください（任意）"
           disabled={loading}
         />
       </div>
@@ -339,28 +364,68 @@ const TodoForm = ({ onSubmit, editingTodo, onCancel, loading }) => {
             style={STYLES.input}
             disabled={loading}
           />
+          {formData.dueDate && (
+            <small style={{ color: '#666', fontSize: '12px' }}>
+              設定された期限: {new Date(formData.dueDate).toLocaleString('ja-JP')}
+            </small>
+          )}
         </div>
       </div>
       
       <div style={STYLES.buttonGroup}>
         <button
           type="submit"
-          style={{ ...STYLES.button, ...STYLES.primaryButton }}
+          style={{ 
+            ...STYLES.button, 
+            ...STYLES.primaryButton,
+            opacity: !formData.title.trim() ? 0.6 : 1,
+            cursor: !formData.title.trim() ? 'not-allowed' : 'pointer'
+          }}
           disabled={loading || !formData.title.trim()}
         >
-          {loading ? '保存中...' : editingTodo ? '更新' : '作成'}
+          {loading ? (editingTodo ? '更新中...' : '作成中...') : (editingTodo ? '更新' : '作成')}
         </button>
+        
         {editingTodo && (
           <button
             type="button"
-            onClick={onCancel}
+            onClick={handleCancel}
             style={{ ...STYLES.button, ...STYLES.secondaryButton }}
             disabled={loading}
           >
             キャンセル
           </button>
         )}
+        
+        {!editingTodo && formData.title && (
+          <button
+            type="button"
+            onClick={() => setFormData(getInitialFormData(null))}
+            style={{ ...STYLES.button, ...STYLES.secondaryButton }}
+            disabled={loading}
+          >
+            リセット
+          </button>
+        )}
       </div>
+      
+      {/* デバッグ情報（開発時のみ表示） */}
+      {process.env.NODE_ENV === 'development' && (
+        <div style={{ 
+          marginTop: '20px', 
+          padding: '10px', 
+          backgroundColor: '#f0f0f0', 
+          borderRadius: '5px',
+          fontSize: '12px',
+          color: '#666'
+        }}>
+          <strong>デバッグ情報:</strong><br />
+          編集モード: {editingTodo ? 'あり' : 'なし'}<br />
+          編集ID: {editingTodo?.id || 'なし'}<br />
+          フォームタイトル: {formData.title}<br />
+          フォーム期限: {formData.dueDate || 'なし'}
+        </div>
+      )}
     </form>
   );
 };
@@ -385,7 +450,18 @@ const TodoItem = ({ todo, onToggle, onEdit, onDelete, loading }) => {
       case 'MEDIUM': return '中';
       case 'HIGH': return '高';
       case 'URGENT': return '緊急';
-      default: return '中';
+    }
+  };
+
+  // 編集ボタンクリック時の処理を強化
+  const handleEditClick = () => {
+    console.log('編集開始 - Todo:', todo);
+    onEdit(todo); // 完全なtodoオブジェクトを渡す
+  };
+
+  const handleDeleteClick = () => {
+    if (confirm(`「${todo.title}」を削除してもよろしいですか？`)) {
+      onDelete(todo);
     }
   };
 
@@ -410,16 +486,30 @@ const TodoItem = ({ todo, onToggle, onEdit, onDelete, loading }) => {
         </div>
         <div style={{ display: 'flex', gap: '10px' }}>
           <button
-            onClick={() => onEdit(todo)}
-            style={{ ...STYLES.button, ...STYLES.primaryButton, padding: '6px 12px', fontSize: '14px' }}
+            onClick={handleEditClick}
+            style={{ 
+              ...STYLES.button, 
+              ...STYLES.primaryButton, 
+              padding: '6px 12px', 
+              fontSize: '14px',
+              opacity: loading ? 0.6 : 1
+            }}
             disabled={loading}
+            title={`「${todo.title}」を編集`}
           >
             編集
           </button>
           <button
-            onClick={() => onDelete(todo)}
-            style={{ ...STYLES.button, ...STYLES.dangerButton, padding: '6px 12px', fontSize: '14px' }}
+            onClick={handleDeleteClick}
+            style={{ 
+              ...STYLES.button, 
+              ...STYLES.dangerButton, 
+              padding: '6px 12px', 
+              fontSize: '14px',
+              opacity: loading ? 0.6 : 1
+            }}
             disabled={loading}
+            title={`「${todo.title}」を削除`}
           >
             削除
           </button>
@@ -427,7 +517,9 @@ const TodoItem = ({ todo, onToggle, onEdit, onDelete, loading }) => {
       </div>
       
       {todo.description && (
-        <p style={{ marginBottom: '10px', color: '#666' }}>{todo.description}</p>
+        <p style={{ marginBottom: '10px', color: '#666', lineHeight: '1.4' }}>
+          {todo.description}
+        </p>
       )}
       
       <div style={STYLES.todoMeta}>
