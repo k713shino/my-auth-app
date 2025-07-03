@@ -4,6 +4,10 @@ import { Amplify } from 'aws-amplify';
 import { Authenticator } from '@aws-amplify/ui-react';
 import '@aws-amplify/ui-react/styles.css';
 import './globals.css';
+import './styles/auth.css';
+import './styles/components.css';
+import { ThemeProvider } from './components/ThemeProvider';
+import { ThemeSwitcher } from './components/ThemeSwitcher';
 
 // 動的にaws-exportsを読み込み、エラーハンドリングを追加
 const configureAmplify = () => {
@@ -35,29 +39,18 @@ export default function RootLayout({ children }) {
     <html lang="ja">
       <body>
         {isConfigured ? (
-          <Authenticator.Provider>
-            {children}
-          </Authenticator.Provider>
+          <ThemeProvider>
+            <ThemeSwitcher />
+            <Authenticator.Provider>
+              {children}
+            </Authenticator.Provider>
+          </ThemeProvider>
         ) : (
-          <div style={{ 
-            padding: '20px', 
-            textAlign: 'center',
-            backgroundColor: '#ffe6e6',
-            color: '#d8000c',
-            border: '1px solid #ffcccb',
-            borderRadius: '5px',
-            margin: '20px'
-          }}>
+          <div className="error-container">
             <h2>設定エラー</h2>
             <p>AWS Amplifyの設定が見つかりません。</p>
             <p>以下のコマンドを実行してください：</p>
-            <code style={{ 
-              display: 'block', 
-              backgroundColor: '#f0f0f0', 
-              padding: '10px', 
-              margin: '10px 0',
-              borderRadius: '3px'
-            }}>
+            <code className="error-code">
               amplify push
             </code>
             {children}

@@ -5,75 +5,6 @@ import { getCurrentUser, signOut } from 'aws-amplify/auth';
 import { useState, useEffect, useCallback } from 'react';
 import { TodoApp } from './components/TodoComponents';
 
-// スタイル定数
-const STYLES = {
-  container: {
-    padding: '20px',
-    textAlign: 'center',
-  },
-  welcomeContainer: {
-    padding: '20px',
-    textAlign: 'center',
-    maxWidth: '1200px',
-    margin: '0 auto',
-  },
-  header: {
-    backgroundColor: '#fff',
-    borderRadius: '10px',
-    boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
-    padding: '20px',
-    marginBottom: '30px',
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    flexWrap: 'wrap',
-  },
-  userInfo: {
-    textAlign: 'left',
-  },
-  button: {
-    padding: '12px 24px',
-    backgroundColor: '#ff4444',
-    color: 'white',
-    border: 'none',
-    borderRadius: '8px',
-    cursor: 'pointer',
-    fontSize: '16px',
-    fontWeight: '500',
-    transition: 'background-color 0.2s ease',
-  },
-  title: {
-    textAlign: 'center',
-    marginBottom: '30px',
-    fontSize: '2rem',
-  },
-  loading: {
-    padding: '20px',
-    textAlign: 'center',
-    fontSize: '18px',
-    color: '#666',
-  },
-  errorContainer: {
-    color: '#e74c3c',
-    textAlign: 'center',
-    marginBottom: '20px',
-    padding: '10px',
-    backgroundColor: '#ffeaea',
-    borderRadius: '5px',
-    border: '1px solid #ffcccb',
-  },
-  authContainer: {
-    maxWidth: '520px',
-    margin: '0 auto',
-  },
-  description: {
-    marginBottom: '30px',
-    color: '#666',
-    fontSize: '16px',
-    lineHeight: '1.5',
-  },
-};
-
 // カスタムフック: 認証状態管理
 const useAuth = () => {
   const [user, setUser] = useState(null);
@@ -113,7 +44,7 @@ const useAuth = () => {
 
 // コンポーネント: ローディング表示
 const LoadingComponent = () => (
-  <div style={STYLES.loading}>
+  <div className="loading">
     <p>読み込み中...</p>
   </div>
 );
@@ -123,38 +54,11 @@ const ErrorComponent = ({ error }) => {
   if (!error) return null;
   
   return (
-    <div style={STYLES.errorContainer}>
+    <div className="message message-error">
       <p>{error}</p>
     </div>
   );
 };
-
-// コンポーネント: ヘッダー
-const Header = ({ user, onSignOut, error }) => (
-  <div style={STYLES.header}>
-    <div style={STYLES.userInfo}>
-      <h2>個人用Todoアプリへようこそ！</h2>
-      <p>ログイン中: <strong>{user.username}</strong></p>
-      <p>ユーザーID: <code>{user.userId}</code></p>
-    </div>
-    
-    <div>
-      <ErrorComponent error={error} />
-      <button 
-        onClick={onSignOut}
-        style={STYLES.button}
-        onMouseEnter={(e) => {
-          e.target.style.backgroundColor = '#e03e3e';
-        }}
-        onMouseLeave={(e) => {
-          e.target.style.backgroundColor = '#ff4444';
-        }}
-      >
-        ログアウト
-      </button>
-    </div>
-  </div>
-);
 
 // フォームフィールド設定
 const FORM_FIELDS = {
@@ -200,6 +104,41 @@ const FORM_FIELDS = {
   },
 };
 
+// コンポーネント: ユーザーコンテンツ
+const UserContent = ({ user, onSignOut, error }) => (
+  <div className="welcome-container">
+    <h1>個人用Todoアプリへようこそ！</h1>
+    <div className="user-content">
+      <div className="user-info">
+        <p>ログイン中: <strong>{user.username}</strong></p>
+        <p>ユーザーID: <code>{user.userId}</code></p>
+      </div>
+      <div>
+        <ErrorComponent error={error} />
+        <button 
+          onClick={onSignOut}
+          className="button button-danger"
+        >
+          ログアウト
+        </button>
+      </div>
+      <TodoApp user={user} />
+    </div>
+  </div>
+);
+
+// コンポーネント: サインイン前の説明表示
+const WelcomeContent = ({ error }) => (
+  <>
+    <h1>個人用Todoアプリへようこそ！</h1>
+    <div className="description">
+      <p>あなた専用のTodoリストを管理できるアプリです。</p>
+      <p>ログインして、タスクの作成、編集、完了管理を始めましょう！</p>
+    </div>
+    <ErrorComponent error={error} />
+  </>
+);
+
 // メインコンポーネント
 export default function Home() {
   const { user, loading, error, handleSignOut, setUser, setError } = useAuth();
@@ -208,53 +147,62 @@ export default function Home() {
     return <LoadingComponent />;
   }
 
-  if (user) {
-    return (
-      <div style={STYLES.welcomeContainer}>
-        <Header 
-          user={user} 
-          onSignOut={handleSignOut} 
-          error={error}
-        />
-        
-        <TodoApp user={user} />
-      </div>
-    );
-  }
-
   return (
-    <div style={STYLES.container}>
-      <h1 style={STYLES.title}>個人用Todoアプリ</h1>
-      <div style={STYLES.description}>
-        <p>あなた専用のTodoリストを管理できるアプリです。</p>
-        <p>ログインして、タスクの作成、編集、完了管理を始めましょう！</p>
-      </div>
-      
-      <ErrorComponent error={error} />
-      
-      <div style={STYLES.authContainer}>
-        <Authenticator
-          signUpAttributes={['email']}
-          formFields={FORM_FIELDS}
-          socialProviders={[]}
-        >
-          {({ signOut, user }) => (
-            <div style={STYLES.welcomeContainer}>
-              <Header 
-                user={user} 
+    <div className="welcome-container">
+      <Authenticator
+        signUpAttributes={['email']}
+        formFields={FORM_FIELDS}
+        socialProviders={[]}
+        className="auth-form"
+        components={{
+          Header: () => <WelcomeContent error={error} />
+        }}
+        messages={{
+          'ja': {
+            'Sign In': 'ログイン',
+            'Sign Up': '新規登録',
+            'Enter your Username': 'ユーザー名を入力',
+            'Enter your Password': 'パスワードを入力',
+            'Forgot your password?': 'パスワードをお忘れですか？',
+            'Reset Password': 'パスワードをリセット',
+            'Send code': 'コードを送信',
+            'Back to Sign In': 'ログインに戻る',
+            'Confirm Sign Up': '登録を確認',
+            'Confirmation Code': '確認コード',
+            'Enter your code': 'コードを入力してください',
+            'Create Account': 'アカウントを作成',
+            'Have an account?': 'アカウントをお持ちですか？',
+            'Sign in': 'ログイン',
+            'No account?': 'アカウントをお持ちでない方',
+            'Create account': 'アカウントを作成',
+            'Reset your password': 'パスワードをリセット',
+            'Submit': '送信',
+            'Skip': 'スキップ',
+            'Verify': '確認',
+            'Verify Contact': '連絡先を確認',
+            'Invalid verification code provided, please try again.': '無効な確認コードです。もう一度お試しください。',
+            'User already exists': 'このユーザーは既に存在します',
+            'Incorrect username or password': 'ユーザー名またはパスワードが正しくありません',
+            'User does not exist': 'ユーザーが存在しません'
+          }
+        }}
+      >
+        {({ signOut, user: authUser }) => {
+          if (authUser) {
+            return (
+              <UserContent 
+                user={authUser}
                 onSignOut={() => {
                   signOut();
                   setUser(null);
-                  setError(null);
-                }} 
+                }}
                 error={error}
               />
-              
-              <TodoApp user={user} />
-            </div>
-          )}
-        </Authenticator>
-      </div>
+            );
+          }
+          return null;
+        }}
+      </Authenticator>
     </div>
   );
 }

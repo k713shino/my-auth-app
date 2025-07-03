@@ -13,228 +13,6 @@ const client = generateClient({
   authMode: 'userPool'
 });
 
-// スタイル定数
-const STYLES = {
-  container: {
-    maxWidth: '800px',
-    margin: '0 auto',
-    padding: '20px',
-  },
-  header: {
-    marginBottom: '30px',
-    textAlign: 'center',
-  },
-  form: {
-    marginBottom: '30px',
-    padding: '20px',
-    backgroundColor: '#f8f9fa',
-    borderRadius: '10px',
-    boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
-  },
-  inputGroup: {
-    marginBottom: '15px',
-  },
-  label: {
-    display: 'block',
-    marginBottom: '5px',
-    fontWeight: 'bold',
-    color: '#333',
-  },
-  input: {
-    width: '100%',
-    padding: '10px',
-    fontSize: '16px',
-    border: '1px solid #ddd',
-    borderRadius: '5px',
-    outline: 'none',
-    transition: 'border-color 0.2s',
-  },
-  textarea: {
-    width: '100%',
-    padding: '10px',
-    fontSize: '16px',
-    border: '1px solid #ddd',
-    borderRadius: '5px',
-    outline: 'none',
-    resize: 'vertical',
-    minHeight: '80px',
-  },
-  select: {
-    width: '100%',
-    padding: '10px',
-    fontSize: '16px',
-    border: '1px solid #ddd',
-    borderRadius: '5px',
-    outline: 'none',
-    cursor: 'pointer',
-  },
-  buttonGroup: {
-    display: 'flex',
-    gap: '10px',
-    marginTop: '20px',
-  },
-  button: {
-    padding: '10px 20px',
-    fontSize: '16px',
-    fontWeight: '500',
-    border: 'none',
-    borderRadius: '5px',
-    cursor: 'pointer',
-    transition: 'all 0.2s ease',
-  },
-  primaryButton: {
-    backgroundColor: '#007bff',
-    color: 'white',
-  },
-  secondaryButton: {
-    backgroundColor: '#6c757d',
-    color: 'white',
-  },
-  dangerButton: {
-    backgroundColor: '#dc3545',
-    color: 'white',
-  },
-  successButton: {
-    backgroundColor: '#28a745',
-    color: 'white',
-  },
-  filterContainer: {
-    marginBottom: '20px',
-    display: 'flex',
-    gap: '10px',
-    justifyContent: 'center',
-    flexWrap: 'wrap',
-  },
-  filterButton: {
-    padding: '8px 16px',
-    fontSize: '14px',
-    border: '1px solid #007bff',
-    borderRadius: '5px',
-    backgroundColor: 'white',
-    color: '#007bff',
-    cursor: 'pointer',
-    transition: 'all 0.2s ease',
-  },
-  activeFilter: {
-    backgroundColor: '#007bff',
-    color: 'white',
-  },
-  todoList: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '15px',
-  },
-  todoItem: {
-    padding: '20px',
-    backgroundColor: 'white',
-    borderRadius: '10px',
-    boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
-    transition: 'transform 0.2s ease, box-shadow 0.2s ease',
-  },
-  todoHeader: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: '10px',
-  },
-  todoTitle: {
-    fontSize: '18px',
-    fontWeight: '600',
-    color: '#333',
-    flex: 1,
-  },
-  todoMeta: {
-    display: 'flex',
-    gap: '15px',
-    marginBottom: '10px',
-    fontSize: '14px',
-    color: '#666',
-  },
-  priority: {
-    padding: '4px 8px',
-    borderRadius: '4px',
-    fontSize: '12px',
-    fontWeight: '500',
-  },
-  priorityLow: {
-    backgroundColor: '#d4edda',
-    color: '#155724',
-  },
-  priorityMedium: {
-    backgroundColor: '#fff3cd',
-    color: '#856404',
-  },
-  priorityHigh: {
-    backgroundColor: '#f8d7da',
-    color: '#721c24',
-  },
-  priorityUrgent: {
-    backgroundColor: '#d1ecf1',
-    color: '#0c5460',
-  },
-  completed: {
-    opacity: 0.6,
-    textDecoration: 'line-through',
-  },
-  overdue: {
-    borderLeft: '4px solid #dc3545',
-  },
-  checkbox: {
-    width: '20px',
-    height: '20px',
-    marginRight: '10px',
-    cursor: 'pointer',
-  },
-  stats: {
-    display: 'flex',
-    justifyContent: 'space-around',
-    padding: '20px',
-    backgroundColor: '#f8f9fa',
-    borderRadius: '10px',
-    marginBottom: '20px',
-  },
-  statItem: {
-    textAlign: 'center',
-  },
-  statNumber: {
-    fontSize: '24px',
-    fontWeight: 'bold',
-    color: '#007bff',
-  },
-  statLabel: {
-    fontSize: '14px',
-    color: '#666',
-  },
-  message: {
-    padding: '15px',
-    marginBottom: '20px',
-    borderRadius: '5px',
-    textAlign: 'center',
-  },
-  successMessage: {
-    backgroundColor: '#d4edda',
-    color: '#155724',
-    border: '1px solid #c3e6cb',
-  },
-  errorMessage: {
-    backgroundColor: '#f8d7da',
-    color: '#721c24',
-    border: '1px solid #f5c6cb',
-  },
-  loading: {
-    textAlign: 'center',
-    padding: '20px',
-    fontSize: '18px',
-    color: '#666',
-  },
-  empty: {
-    textAlign: 'center',
-    padding: '40px',
-    color: '#666',
-    fontSize: '16px',
-  },
-};
-
 // TodoFormコンポーネント
 const TodoForm = ({ onSubmit, editingTodo, onCancel, loading }) => {
   // 編集時の日時フォーマットを修正
@@ -302,50 +80,45 @@ const TodoForm = ({ onSubmit, editingTodo, onCancel, loading }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} style={STYLES.form}>
-      <h3 style={{ marginBottom: '20px', color: '#333' }}>
-        {editingTodo ? `「${editingTodo.title}」を編集` : '新しいTodoを作成'}
-      </h3>
+    <form onSubmit={handleSubmit} className="form">
+      <h3>{editingTodo ? `「${editingTodo.title}」を編集` : '新しいTodoを作成'}</h3>
       
-      <div style={STYLES.inputGroup}>
-        <label style={STYLES.label}>タイトル*</label>
+      <div className="input-group">
+        <label className="label">タイトル*</label>
         <input
           type="text"
           value={formData.title}
           onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-          style={{
-            ...STYLES.input,
-            borderColor: formData.title.trim() ? '#ddd' : '#ff6b6b'
-          }}
+          className={`input ${!formData.title.trim() ? 'input-error' : ''}`}
           placeholder="タイトルを入力してください"
           required
           disabled={loading}
         />
         {!formData.title.trim() && (
-          <small style={{ color: '#ff6b6b', fontSize: '12px' }}>
+          <small className="error-text">
             ※ タイトルは必須項目です
           </small>
         )}
       </div>
       
-      <div style={STYLES.inputGroup}>
-        <label style={STYLES.label}>詳細</label>
+      <div className="input-group">
+        <label className="label">詳細</label>
         <textarea
           value={formData.description}
           onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-          style={STYLES.textarea}
+          className="textarea"
           placeholder="詳細を入力してください（任意）"
           disabled={loading}
         />
       </div>
       
-      <div style={{ display: 'flex', gap: '15px' }}>
-        <div style={{ ...STYLES.inputGroup, flex: 1 }}>
-          <label style={STYLES.label}>優先度</label>
+      <div className="form-row">
+        <div className="input-group flex-1">
+          <label className="label">優先度</label>
           <select
             value={formData.priority}
             onChange={(e) => setFormData({ ...formData, priority: e.target.value })}
-            style={STYLES.select}
+            className="select"
             disabled={loading}
           >
             <option value="LOW">低</option>
@@ -355,32 +128,27 @@ const TodoForm = ({ onSubmit, editingTodo, onCancel, loading }) => {
           </select>
         </div>
         
-        <div style={{ ...STYLES.inputGroup, flex: 1 }}>
-          <label style={STYLES.label}>期限</label>
+        <div className="input-group flex-1">
+          <label className="label">期限</label>
           <input
             type="datetime-local"
             value={formData.dueDate}
             onChange={(e) => setFormData({ ...formData, dueDate: e.target.value })}
-            style={STYLES.input}
+            className="input"
             disabled={loading}
           />
           {formData.dueDate && (
-            <small style={{ color: '#666', fontSize: '12px' }}>
+            <small className="help-text">
               設定された期限: {new Date(formData.dueDate).toLocaleString('ja-JP')}
             </small>
           )}
         </div>
       </div>
       
-      <div style={STYLES.buttonGroup}>
+      <div className="button-group">
         <button
           type="submit"
-          style={{ 
-            ...STYLES.button, 
-            ...STYLES.primaryButton,
-            opacity: !formData.title.trim() ? 0.6 : 1,
-            cursor: !formData.title.trim() ? 'not-allowed' : 'pointer'
-          }}
+          className={`button button-primary ${!formData.title.trim() ? 'button-disabled' : ''}`}
           disabled={loading || !formData.title.trim()}
         >
           {loading ? (editingTodo ? '更新中...' : '作成中...') : (editingTodo ? '更新' : '作成')}
@@ -390,7 +158,7 @@ const TodoForm = ({ onSubmit, editingTodo, onCancel, loading }) => {
           <button
             type="button"
             onClick={handleCancel}
-            style={{ ...STYLES.button, ...STYLES.secondaryButton }}
+            className="button button-secondary"
             disabled={loading}
           >
             キャンセル
@@ -401,7 +169,7 @@ const TodoForm = ({ onSubmit, editingTodo, onCancel, loading }) => {
           <button
             type="button"
             onClick={() => setFormData(getInitialFormData(null))}
-            style={{ ...STYLES.button, ...STYLES.secondaryButton }}
+            className="button button-secondary"
             disabled={loading}
           >
             リセット
@@ -411,14 +179,7 @@ const TodoForm = ({ onSubmit, editingTodo, onCancel, loading }) => {
       
       {/* デバッグ情報（開発時のみ表示） */}
       {process.env.NODE_ENV === 'development' && (
-        <div style={{ 
-          marginTop: '20px', 
-          padding: '10px', 
-          backgroundColor: '#f0f0f0', 
-          borderRadius: '5px',
-          fontSize: '12px',
-          color: '#666'
-        }}>
+        <div className="debug-info">
           <strong>デバッグ情報:</strong><br />
           編集モード: {editingTodo ? 'あり' : 'なし'}<br />
           編集ID: {editingTodo?.id || 'なし'}<br />
@@ -434,13 +195,13 @@ const TodoForm = ({ onSubmit, editingTodo, onCancel, loading }) => {
 const TodoItem = ({ todo, onToggle, onEdit, onDelete, loading }) => {
   const isOverdue = todo.dueDate && !todo.completed && isAfter(new Date(), new Date(todo.dueDate));
   
-  const getPriorityStyle = (priority) => {
+  const getPriorityClass = (priority) => {
     switch (priority) {
-      case 'LOW': return STYLES.priorityLow;
-      case 'MEDIUM': return STYLES.priorityMedium;
-      case 'HIGH': return STYLES.priorityHigh;
-      case 'URGENT': return STYLES.priorityUrgent;
-      default: return STYLES.priorityMedium;
+      case 'LOW': return 'priority-low';
+      case 'MEDIUM': return 'priority-medium';
+      case 'HIGH': return 'priority-high';
+      case 'URGENT': return 'priority-urgent';
+      default: return 'priority-medium';
     }
   };
 
@@ -456,7 +217,7 @@ const TodoItem = ({ todo, onToggle, onEdit, onDelete, loading }) => {
   // 編集ボタンクリック時の処理を強化
   const handleEditClick = () => {
     console.log('編集開始 - Todo:', todo);
-    onEdit(todo); // 完全なtodoオブジェクトを渡す
+    onEdit(todo);
   };
 
   const handleDeleteClick = () => {
@@ -466,34 +227,22 @@ const TodoItem = ({ todo, onToggle, onEdit, onDelete, loading }) => {
   };
 
   return (
-    <div
-      style={{
-        ...STYLES.todoItem,
-        ...(todo.completed ? STYLES.completed : {}),
-        ...(isOverdue ? STYLES.overdue : {}),
-      }}
-    >
-      <div style={STYLES.todoHeader}>
-        <div style={{ display: 'flex', alignItems: 'center', flex: 1 }}>
+    <div className={`todo-item ${todo.completed ? 'completed' : ''} ${isOverdue ? 'overdue' : ''}`}>
+      <div className="todo-header">
+        <div className="todo-header-left">
           <input
             type="checkbox"
             checked={todo.completed}
             onChange={() => onToggle(todo)}
-            style={STYLES.checkbox}
+            className="checkbox"
             disabled={loading}
           />
-          <h4 style={STYLES.todoTitle}>{todo.title}</h4>
+          <h4 className="todo-title">{todo.title}</h4>
         </div>
-        <div style={{ display: 'flex', gap: '10px' }}>
+        <div className="button-group">
           <button
             onClick={handleEditClick}
-            style={{ 
-              ...STYLES.button, 
-              ...STYLES.primaryButton, 
-              padding: '6px 12px', 
-              fontSize: '14px',
-              opacity: loading ? 0.6 : 1
-            }}
+            className={`button button-primary button-sm ${loading ? 'button-disabled' : ''}`}
             disabled={loading}
             title={`「${todo.title}」を編集`}
           >
@@ -501,13 +250,7 @@ const TodoItem = ({ todo, onToggle, onEdit, onDelete, loading }) => {
           </button>
           <button
             onClick={handleDeleteClick}
-            style={{ 
-              ...STYLES.button, 
-              ...STYLES.dangerButton, 
-              padding: '6px 12px', 
-              fontSize: '14px',
-              opacity: loading ? 0.6 : 1
-            }}
+            className={`button button-danger button-sm ${loading ? 'button-disabled' : ''}`}
             disabled={loading}
             title={`「${todo.title}」を削除`}
           >
@@ -517,17 +260,17 @@ const TodoItem = ({ todo, onToggle, onEdit, onDelete, loading }) => {
       </div>
       
       {todo.description && (
-        <p style={{ marginBottom: '10px', color: '#666', lineHeight: '1.4' }}>
+        <p className="todo-description">
           {todo.description}
         </p>
       )}
       
-      <div style={STYLES.todoMeta}>
-        <span style={{ ...STYLES.priority, ...getPriorityStyle(todo.priority) }}>
+      <div className="todo-meta">
+        <span className={`priority ${getPriorityClass(todo.priority)}`}>
           {getPriorityLabel(todo.priority)}
         </span>
         {todo.dueDate && (
-          <span style={{ color: isOverdue ? '#dc3545' : '#666' }}>
+          <span className={isOverdue ? 'text-danger' : ''}>
             期限: {format(new Date(todo.dueDate), 'yyyy/MM/dd HH:mm')}
             {isOverdue && ' (期限切れ)'}
           </span>
@@ -815,44 +558,41 @@ export const TodoApp = ({ user }) => {
   };
 
   if (loading) {
-    return <div style={STYLES.loading}>読み込み中...</div>;
+    return <div className="loading">読み込み中...</div>;
   }
 
   return (
-    <div style={STYLES.container}>
-      <div style={STYLES.header}>
+    <div className="container">
+      <div className="header">
         <h1>{user.username}さんのTodoリスト</h1>
       </div>
 
       {/* メッセージ表示 */}
       {message.text && (
-        <div style={{
-          ...STYLES.message,
-          ...(message.type === 'success' ? STYLES.successMessage : STYLES.errorMessage)
-        }}>
+        <div className={`message ${message.type === 'success' ? 'message-success' : 'message-error'}`}>
           {message.text}
         </div>
       )}
 
       {/* 統計情報 */}
-      <div style={STYLES.stats}>
-        <div style={STYLES.statItem}>
-          <div style={STYLES.statNumber}>{stats.total}</div>
-          <div style={STYLES.statLabel}>全て</div>
+      <div className="stats">
+        <div className="stat-item">
+          <div className="stat-number">{stats.total}</div>
+          <div className="stat-label">全て</div>
         </div>
-        <div style={STYLES.statItem}>
-          <div style={STYLES.statNumber}>{stats.active}</div>
-          <div style={STYLES.statLabel}>未完了</div>
+        <div className="stat-item">
+          <div className="stat-number">{stats.active}</div>
+          <div className="stat-label">未完了</div>
         </div>
-        <div style={STYLES.statItem}>
-          <div style={STYLES.statNumber}>{stats.completed}</div>
-          <div style={STYLES.statLabel}>完了</div>
+        <div className="stat-item">
+          <div className="stat-number">{stats.completed}</div>
+          <div className="stat-label">完了</div>
         </div>
-        <div style={STYLES.statItem}>
-          <div style={{ ...STYLES.statNumber, color: stats.overdue > 0 ? '#dc3545' : '#007bff' }}>
+        <div className="stat-item">
+          <div className={`stat-number ${stats.overdue > 0 ? 'text-danger' : ''}`}>
             {stats.overdue}
           </div>
-          <div style={STYLES.statLabel}>期限切れ</div>
+          <div className="stat-label">期限切れ</div>
         </div>
       </div>
 
@@ -865,31 +605,22 @@ export const TodoApp = ({ user }) => {
       />
 
       {/* フィルタ */}
-      <div style={STYLES.filterContainer}>
+      <div className="filter-container">
         <button
           onClick={() => setFilter('all')}
-          style={{
-            ...STYLES.filterButton,
-            ...(filter === 'all' ? STYLES.activeFilter : {})
-          }}
+          className={`filter-button ${filter === 'all' ? 'active' : ''}`}
         >
           すべて ({stats.total})
         </button>
         <button
           onClick={() => setFilter('active')}
-          style={{
-            ...STYLES.filterButton,
-            ...(filter === 'active' ? STYLES.activeFilter : {})
-          }}
+          className={`filter-button ${filter === 'active' ? 'active' : ''}`}
         >
           未完了 ({stats.active})
         </button>
         <button
           onClick={() => setFilter('completed')}
-          style={{
-            ...STYLES.filterButton,
-            ...(filter === 'completed' ? STYLES.activeFilter : {})
-          }}
+          className={`filter-button ${filter === 'completed' ? 'active' : ''}`}
         >
           完了済み ({stats.completed})
         </button>
@@ -897,7 +628,7 @@ export const TodoApp = ({ user }) => {
 
       {/* Todoリスト */}
       {filteredTodos.length > 0 ? (
-        <div style={STYLES.todoList}>
+        <div className="todo-list">
           {filteredTodos.map(todo => (
             <TodoItem
               key={todo.id}
@@ -910,7 +641,7 @@ export const TodoApp = ({ user }) => {
           ))}
         </div>
       ) : (
-        <div style={STYLES.empty}>
+        <div className="empty">
           {filter === 'all' ? 'Todoがありません' : 
            filter === 'active' ? '未完了のTodoがありません' : 
            '完了したTodoがありません'}
