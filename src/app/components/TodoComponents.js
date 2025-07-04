@@ -13,6 +13,45 @@ const client = generateClient({
   authMode: 'userPool'
 });
 
+// 優先度の重要度を数値に変換する関数
+const getPriorityWeight = (priority) => {
+  switch (priority) {
+    case 'URGENT': return 4;  // 緊急（一番重要）
+    case 'HIGH': return 3;    // 高い
+    case 'MEDIUM': return 2;  // 中程度
+    case 'LOW': return 1;     // 低い
+    default: return 0;        // 未設定
+  }
+};
+
+// 総合的なソート関数
+const sortTodos = (todos) => {
+  return todos.sort((a, b) => {
+    // 1. 完了済みは後回し
+    if (a.completed !== b.completed) {
+      return a.completed ? 1 : -1; // 完了していない方が先
+    }
+    
+    // 2. 優先度で比較（数値が大きい方が先）
+    const priorityDiff = getPriorityWeight(b.priority) - getPriorityWeight(a.priority);
+    if (priorityDiff !== 0) {
+      return priorityDiff;
+    }
+    
+    // 3. 期限で比較（期限が近い方が先）
+    if (a.dueDate && b.dueDate) {
+      return new Date(a.dueDate) - new Date(b.dueDate);
+    } else if (a.dueDate) {
+      return -1; // aのみ期限あり → aが先
+    } else if (b.dueDate) {
+      return 1;  // bのみ期限あり → bが先
+    }
+    
+    // 4. 最後に作成日時で比較（新しい方が先）
+    return new Date(b.createdAt) - new Date(a.createdAt);
+  });
+};
+
 // TodoFormコンポーネント
 const TodoForm = ({ onSubmit, editingTodo, onCancel, loading }) => {
   // 編集時の日時フォーマットを修正
@@ -214,6 +253,18 @@ const TodoItem = ({ todo, onToggle, onEdit, onDelete, loading }) => {
     }
   };
 
+  const getSortIndicator = (todo) => {
+    const now = new Date();
+    const dueDate = todo.dueDate ? new Date(todo.dueDate) : null;
+    const isOverdue = dueDate && dueDate < now && !todo.completed;
+    
+    if (isOverdue) return '🚨'; // 期限切れ
+    if (todo.priority === 'URGENT') return '🔴';   // 緊急
+    if (todo.priority === 'HIGH') return '🟠';     // 高
+    if (todo.priority === 'MEDIUM') return '🟡';   // 中
+    return '🟢'; // 低
+  };
+
   // 編集ボタンクリック時の処理を強化
   const handleEditClick = () => {
     console.log('編集開始 - Todo:', todo);
@@ -237,7 +288,7 @@ const TodoItem = ({ todo, onToggle, onEdit, onDelete, loading }) => {
             className="checkbox"
             disabled={loading}
           />
-          <h4 className="todo-title">{todo.title}</h4>
+          <h4 className="todo-title">{getSortIndicator(todo)} {todo.title}</h4>
         </div>
         <div className="button-group">
           <button
@@ -315,10 +366,12 @@ export const TodoApp = ({ user }) => {
       });
       
       const todoList = result.data.listTodos.items
-        .filter(item => !item._deleted)
-        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        .filter(item => !item._deleted);
       
-      setTodos(todoList);
+      // 新しいソート関数を使用
+      const sortedTodos = sortTodos(todoList);
+      
+      setTodos(sortedTodos);
     } catch (error) {
       console.error('Todo取得エラー:', error);
       showMessage('error', 'Todoの取得に失敗しました');
@@ -338,11 +391,13 @@ export const TodoApp = ({ user }) => {
     }).subscribe({
       next: ({ data }) => {
         const newTodo = data.onCreateTodo;
-        setTodos(prev => [newTodo, ...prev.filter(t => t.id !== newTodo.id)]);
+        setTodos(prev => {
+          const updatedTodos = [newTodo, ...prev.filter(t => t.id !== newTodo.id)];
+          return sortTodos(updatedTodos); // ソートを適用
+        });
       },
       error: (err) => console.error('Create subscription error:', err)
     });
-    subscriptions.push(createSub);
 
     // Todo更新の監視
     const updateSub = client.graphql({
@@ -351,11 +406,13 @@ export const TodoApp = ({ user }) => {
     }).subscribe({
       next: ({ data }) => {
         const updatedTodo = data.onUpdateTodo;
-        setTodos(prev => prev.map(t => t.id === updatedTodo.id ? updatedTodo : t));
+        setTodos(prev => {
+          const updatedTodos = prev.map(t => t.id === updatedTodo.id ? updatedTodo : t);
+          return sortTodos(updatedTodos); // ソートを適用
+        });
       },
       error: (err) => console.error('Update subscription error:', err)
     });
-    subscriptions.push(updateSub);
 
     // Todo削除の監視
     const deleteSub = client.graphql({
